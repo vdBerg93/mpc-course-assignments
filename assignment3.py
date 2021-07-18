@@ -37,14 +37,18 @@ class ModelPredictiveControl:
         for k in range(0,self.horizon):
             state = self.plant_model(state, self.dt, u[k*2], u[k*2+1])
             d_goal = np.power(state[0]-ref[0],2) + np.power(state[1]-ref[1],2)
-            d_obs = np.power(state[0]-self.x_obs,2) + np.power(state[1]-self.y_obs,2)
 
-            #cost += (d_obs<2)*d_obs
-            cost += 200/d_obs
+            cost += self.cost_obstacle(state)
             cost += self.w_pos*(d_goal)       # distance
             cost += abs(state[2]-ref[2])**2     # heading
-            #cost += abs(u[k*2])**2              # acceleration
-            #cost += (state[3]<0)*state[3]**2    #reverse
+            cost += abs(u[k*2])**2              # acceleration
         return cost
+
+    def cost_obstacle(self, state):
+        d_obs = np.sqrt((state[0]-self.x_obs)**2 + (state[1]-self.y_obs)**2)
+        if d_obs > 2:
+            return 0
+        else:
+            return 1/d_obs*150
 
 sim_run(options, ModelPredictiveControl)
