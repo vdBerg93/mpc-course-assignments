@@ -27,7 +27,7 @@ class ModelPredictiveControl:
         state = args[0]
         ref = args[1]
         cost = 0
-        for u_i in u:
+        for u_i in range(0, self.horizon):
             state = self.plant_model(state, self.dt, u_i, None)
             d_goal = ref[0]-state[0]
             err_speed = state[3]-self.vmax
